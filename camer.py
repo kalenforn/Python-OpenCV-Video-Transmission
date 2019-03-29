@@ -49,7 +49,7 @@ class VideoFrame:
     # 编码，只负责编img变量的函数，在socket传输中还需要加工
     def imencode(self, quality=12, format='.jpg'):
 
-        assert self._img != None
+        assert len(self._img) != 0
 
         params = [int(cv2.IMWRITE_JPEG_QUALITY), quality]
         img = cv2.resize(self._img,self.__resolution)
@@ -63,6 +63,7 @@ class VideoFrame:
         # 帧存储在保护变量img里
         self._img = self._cap.read()[1]
         # 帧数加1
+        # print(self._img)
         self.addFrame()
         #return self.getImg()
 
@@ -76,6 +77,9 @@ class VideoFrame:
         self._writer.write(buffer)
         self.addFrame()
     
+    def savePicture(self, filename):
+        cv2.imwrite(filename, self._img)
+
     # 释放writer,保存视频
     def saveRelease(self):
 

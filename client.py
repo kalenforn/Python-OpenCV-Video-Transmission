@@ -20,7 +20,7 @@ class Client:
         # initial dynamic parameter of saving used
 
         self.__address = address
-        self.__savePath = savePath
+        self.__savePath = savePath + "/Video/"
         # 传输图像质量，0～100，值越高图片质量越高，但是在低速网络中值越大传输失败率也随之增大
         self.__frameQuality = frameQuality
         # self.__transSize = transSize
@@ -31,7 +31,7 @@ class Client:
         try:
             os.mkdir(self.__savePath)
             info = "Made Dir:{}".format(self.__savePath)
-            self.__write_ordinary_logs(info)
+            self._write_ordinary_logs(info)
         except:
             pass
 
@@ -40,7 +40,7 @@ class Client:
         try:
             os.mkdir(self._save_floder)
             info = "Made Dir:{}".format(self._save_floder)
-            self.__write_ordinary_logs(info)
+            self._write_ordinary_logs(info)
         except:
             pass
 
@@ -48,7 +48,7 @@ class Client:
         try:
             os.mknod(self._file_name)
             info = "Touch File:{}".format(self._file_name)
-            self.__write_ordinary_logs(info)
+            self._write_ordinary_logs(info)
         except:
             pass
 
@@ -57,26 +57,26 @@ class Client:
         self._count_frame = 0
     
     # 写出错日志
-    def __write_error_logs(self, e):
+    def _write_error_logs(self, e):
 
         tm_year, tm_mon, tm_mday, tm_hour, tm_min, tm_sec, _, _, _ = time.localtime()
-        with open("Error_log", 'a+') as f:
+        with open("Error_log_client", 'a+') as f:
             f.writelines("\n*********************************************************************\n")
             f.write("Error:time:{0:4d}/{1:2d}/{2:2d},{3:2d}:{4:2d}:{5:2d}\\\\\n:{6}".format(tm_year, 
                         tm_mon, tm_mday, tm_hour, tm_min, tm_sec, traceback.format_exc()))
             f.writelines("*********************************************************************\n")
     
     # 写普通运行结果日志
-    def __write_ordinary_logs(self, info, head=True):
+    def _write_ordinary_logs(self, info, head=True):
         
         assert isinstance(info, str)
         assert isinstance(head, bool)
 
         tm_year, tm_mon, tm_mday, tm_hour, tm_min, tm_sec, _, _, _ = time.localtime()
-        with open('Running_log', 'a+') as f:
+        with open('Run_log_client', 'a+') as f:
             if head :
                 f.writelines("\n*********************************************************************\n")
-            f.write("INFO:time:{0:4d}/{1:2d}/{2:2d},{3:2d}:{4:2d}:{5:2d}\n{6}".format(tm_year, 
+            f.write("INFO:time:{0:4d}/{1:2d}/{2:2d},{3:2d}:{4:2d}:{5:2d}\\\\{6}".format(tm_year, 
                         tm_mon, tm_mday, tm_hour, tm_min, tm_sec, info + "\n"))
 
     # 创建socket连接
@@ -86,10 +86,10 @@ class Client:
             # self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self._socket.connect(self.__address)
             info = "Socket connected, address: {}".format(self.__address[0])
-            self.__write_ordinary_logs(info)
+            self._write_ordinary_logs(info)
             # print(info)
         except Exception as e: #ConnectionRefusedError
-            self.__write_error_logs(e)
+            self._write_error_logs(e)
             # print(e)
 
     # 判断是否需要重新创建writer，并且release掉writer保存视频
@@ -104,8 +104,8 @@ class Client:
         
         if flag:
             self._video.saveRelease()
-            info = "File save at: {0}\nFPS: {1}".format(self._file_name, self._FPS)
-            self.__write_ordinary_logs(info, False)
+            info = "File save at: {0}\nFPS: {1}".format(self._file_name, self._video.getFrame())
+            self._write_ordinary_logs(info, False)
             # print("INFO:time: {0:4d}/{1:2d}/{2:2d},{3:2d}:{4:2d}:{5:2d}, File save at :{6}\nNumber of frame is {7:04d}".format(tm_year, 
              #                       tm_mon, tm_mday, tm_hour, tm_min, tm_sec, self._file_name, self._count_frame))
             
@@ -126,14 +126,13 @@ class Client:
             self._start_time.update({"year": tm_year, "month": tm_mon, "day": tm_mday, 
                 "hour":tm_hour, "min":tm_min, "sec":tm_sec})
             self._video.clearFrame()
-            self._FPS = 0
 
 
     # 保存视频
     def _save_video(self, buffer):
         
         self._isCreateNewWriter()
-        self._FPS += 1
+        self._video.addFrame()
         self._video.writeVideo(buffer)
 
     # 启动所有任务
@@ -174,7 +173,7 @@ class Client:
                 self._save_video(buffer)
                 self._video.showVidoe(buffer)
             except Exception as e:
-                self.__write_error_logs(e)
+                self._write_error_logs(e)
                 self._isCreateNewWriter()
              #   print(e)
               #  break
@@ -189,14 +188,17 @@ class Client:
         self._video.destroyAllWindows()
 
 def main():
-    try:
-        client = Client()
-        #while True:
-        client.run()
-    except Exception as e:
-        client.__write_error_logs(e)
-    finally:
-        client.close()
+    while True:
+
+        try:
+            client = Client()
+            #while True:
+            client.run()
+        except Exception as e:
+            # 这个地方的日志处理有点问题，需要修改，异常抛出以后文件是更新了，但是内存里的FPS没有更新和写入log文件
+            client._write_error_logs(e)
+        finally:
+            client.close()
 
 if __name__ == '__main__':
     main()
