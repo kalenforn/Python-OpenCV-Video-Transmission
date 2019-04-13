@@ -17,9 +17,9 @@
     3.Change the Ip
   
 # Start Using This:
-    1. </python3 server.py>
+    1. python3 server.py
       start server to receive video frame
-    2. </python3 client.py>
+    2. python3 client.py
       start client to send video frame
     3. you can stop it working when you selected the cv2.imshow's windows then clicking the 'q', it will shut down Client working, Server will running but will not receive any data untill the next socket. 
 
