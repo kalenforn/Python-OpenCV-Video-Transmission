@@ -1,14 +1,14 @@
-# Using Environment:
-  1.python3.6 ++
-  2.opencv, socket, struct, datetime
-  3.pytorch1.0.1 ++
-  4.linux(linux + linux or linux + respberry) //the respberry is client to collect the video,and running server.py on PC.
-  5.object detection model is yolov3, from:https://github.com/ultralytics/yolov3  not exactly the same as the original template.
-  6.Peripheral：USB camera (must support the UVC protocol), your Laptop's camera is also supposed.
-
 # Introduction
   This program use python-opencv to get video and transmit the video from WiFi .It can work on any machine that can use python-opencv.
   This project use of USB camera to capture video, and the video is transmitted to another computer through the Route for storage and display, with high real-time performance, it used yolov3 model to detect the object.
+
+# Using Environment:
+   1.python3.6 ++
+   2.opencv, socket, struct, datetime
+   3.pytorch1.0.1 ++
+   4.linux(linux + linux or linux + respberry) //the respberry is client to collect the video,and running server.py on PC.
+   5.object detection model is yolov3, from:https://github.com/ultralytics/yolov3  not exactly the same as the original template.
+   6.Peripheral：USB camera (must support the UVC protocol), your Laptop's camera is also supposed.
 
 # Start :
   There are three things to note when starting this program ：
